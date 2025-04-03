@@ -1,5 +1,5 @@
 // チャートインスタンスを格納する変数
-let expenseChart, investmentChart, breakevenChart, paybackChart;
+let expenseChart, investmentChart, paybackChart;
 
 // Chart.jsの共通設定
 Chart.register(ChartDataLabels);
@@ -26,9 +26,30 @@ function initCharts() {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
+      cutout: '50%',
       plugins: {
         legend: {
-          position: 'right'
+          position: 'right',
+          labels: {
+            boxWidth: 12,
+            padding: 10,
+            font: { size: 11 }
+          }
+        },
+        datalabels: {
+          formatter: (value, ctx) => {
+            const total = ctx.dataset.data.reduce((acc, data) => acc + data, 0);
+            const percentage = Math.round(value / total * 100);
+            return value > 0 ? `${Math.round(value)}万円\n(${percentage}%)` : '';
+          },
+          color: 'white',
+          font: {
+            weight: 'bold',
+            size: 10
+          },
+          textStrokeColor: 'rgba(0, 0, 0, 0.2)',
+          textStrokeWidth: 1
         }
       }
     }
@@ -37,7 +58,7 @@ function initCharts() {
   // 初期投資内訳チャート
   const investmentCtx = document.getElementById('investment-chart').getContext('2d');
   investmentChart = new Chart(investmentCtx, {
-    type: 'pie',
+    type: 'doughnut',
     data: {
       labels: ['内装工事', '厨房設備', '家具・備品', '保証金・敷金', 'その他初期費用'],
       datasets: [{
@@ -53,87 +74,30 @@ function initCharts() {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
+      cutout: '50%',
       plugins: {
         legend: {
-          position: 'right'
-        }
-      }
-    }
-  });
-
-  // 損益分岐点チャート
-  const breakevenCtx = document.getElementById('breakeven-chart').getContext('2d');
-  breakevenChart = new Chart(breakevenCtx, {
-    type: 'bar',
-    data: {
-      labels: ['0', '10', '20', '30', '40', '50', '60', '70', '80'],
-      datasets: [
-        {
-          label: '売上',
-          type: 'bar',
-          data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-          backgroundColor: 'rgba(76, 175, 80, 0.6)',
-          borderColor: 'rgba(76, 175, 80, 1)',
-          borderWidth: 1,
-          order: 2
-        },
-        {
-          label: '固定費',
-          type: 'bar',
-          data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-          backgroundColor: 'rgba(244, 67, 54, 0.6)',
-          borderColor: 'rgba(244, 67, 54, 1)',
-          borderWidth: 1,
-          order: 2
-        },
-        {
-          label: '変動費',
-          type: 'bar',
-          data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-          backgroundColor: 'rgba(255, 152, 0, 0.6)',
-          borderColor: 'rgba(255, 152, 0, 1)',
-          borderWidth: 1,
-          order: 2
-        },
-        {
-          label: '損益分岐点',
-          type: 'line',
-          data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-          borderColor: 'rgba(156, 39, 176, 1)',
-          borderWidth: 2,
-          borderDash: [5, 5],
-          fill: false,
-          pointRadius: 0,
-          order: 1
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        x: {
-          stacked: true,
-          title: {
-            display: true,
-            text: '1日あたりの客数'
+          position: 'right',
+          labels: {
+            boxWidth: 12,
+            padding: 10,
+            font: { size: 11 }
           }
         },
-        y: {
-          stacked: true,
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: '金額（万円）'
-          }
-        }
-      },
-      plugins: {
-        tooltip: {
-          mode: 'index',
-          intersect: false
-        },
-        legend: {
-          position: 'top'
+        datalabels: {
+          formatter: (value, ctx) => {
+            const total = ctx.dataset.data.reduce((acc, data) => acc + data, 0);
+            const percentage = Math.round(value / total * 100);
+            return value > 0 ? `${Math.round(value)}万円\n(${percentage}%)` : '';
+          },
+          color: 'white',
+          font: {
+            weight: 'bold',
+            size: 10
+          },
+          textStrokeColor: 'rgba(0, 0, 0, 0.2)',
+          textStrokeWidth: 1
         }
       }
     }
@@ -170,12 +134,42 @@ function initCharts() {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: {
+            boxWidth: 12,
+            padding: 10,
+            font: { size: 11 }
+          }
+        },
+        datalabels: {
+          formatter: (value, ctx) => {
+            if (ctx.dataset.type === 'line') return null;
+            return value > 0 ? `${Math.round(value)}万円` : '';
+          },
+          color: 'rgba(0, 0, 0, 0.7)',
+          font: {
+            weight: 'bold',
+            size: 10
+          },
+          anchor: 'end',
+          align: 'top',
+          offset: 0
+        }
+      },
       scales: {
         y: {
           beginAtZero: true,
           title: {
             display: true,
             text: '金額（万円）'
+          },
+          ticks: {
+            callback: function(value) {
+              return Math.round(value) + '万円';
+            }
           }
         }
       }
@@ -183,196 +177,31 @@ function initCharts() {
   });
 }
 
-// グラフのオプション設定
-function getExpenseChartOptions() {
-  return {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: 'right',
-        labels: {
-          boxWidth: 15,
-          padding: 15,
-          font: { size: 12 }
-        }
-      },
-      datalabels: {
-        formatter: (value, ctx) => {
-          const label = ctx.chart.data.labels[ctx.dataIndex];
-          const total = ctx.dataset.data.reduce((acc, data) => acc + data, 0);
-          const percentage = (value / total * 100).toFixed(1) + '%';
-          return value > 0 ? `${value.toFixed(1)}万円\n(${percentage})` : '';
-        },
-        color: 'white',
-        font: {
-          weight: 'bold',
-          size: 11
-        },
-        textAlign: 'center',
-        textStrokeColor: 'rgba(0, 0, 0, 0.2)',
-        textStrokeWidth: 1,
-        padding: 6
-      }
-    }
-  };
-}
-
-function getInvestmentChartOptions() {
-  return {
-    responsive: true,
-    maintainAspectRatio: false,
-    cutout: '60%',
-    plugins: {
-      legend: {
-        position: 'right',
-        labels: {
-          boxWidth: 15,
-          padding: 15,
-          font: { size: 12 }
-        }
-      },
-      datalabels: {
-        formatter: (value, ctx) => {
-          const total = ctx.dataset.data.reduce((acc, data) => acc + data, 0);
-          const percentage = Math.round(value / total * 100);
-          return value > 0 ? `${value}万円\n(${percentage}%)` : '';
-        },
-        color: 'white',
-        font: {
-          weight: 'bold',
-          size: 11
-        },
-        textStrokeColor: 'rgba(0, 0, 0, 0.2)',
-        textStrokeWidth: 1,
-        padding: 6
-      }
-    }
-  };
-}
-
-function getBreakevenChartOptions() {
-  return {
-    responsive: true,
-    maintainAspectRatio: false,
-    interaction: {
-      mode: 'index',
-      intersect: false
-    },
-    plugins: {
-      legend: {
-        position: 'top',
-        labels: {
-          boxWidth: 12,
-          padding: 15,
-          font: { size: 12 }
-        }
-      },
-      datalabels: {
-        display: false
-      }
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        title: {
-          display: true,
-          text: '金額（万円）'
-        },
-        ticks: {
-          callback: function(value) {
-            return value + '万円';
-          }
-        }
-      },
-      x: {
-        title: {
-          display: true,
-          text: '1日あたりの来客数'
-        }
-      }
-    }
-  };
-}
-
-function getPaybackChartOptions() {
-  return {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: 'top',
-        labels: {
-          boxWidth: 12,
-          padding: 15,
-          font: { size: 12 }
-        }
-      },
-      datalabels: {
-        formatter: (value, ctx) => {
-          if (ctx.dataset.type === 'line') return null;
-          return value > 0 ? `${value.toFixed(0)}万円` : '';
-        },
-        color: 'rgba(0, 0, 0, 0.7)',
-        font: {
-          weight: 'bold',
-          size: 11
-        },
-        anchor: 'end',
-        align: 'top',
-        offset: 0
-      }
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        title: {
-          display: true,
-          text: '金額（万円）'
-        },
-        ticks: {
-          callback: function(value) {
-            return value + '万円';
-          }
-        }
-      }
-    }
-  };
-}
-
 // グラフの更新
 function updateCharts(data) {
   // 支出内訳チャートの更新
   expenseChart.data.datasets[0].data = [
-    data.foodCost,
-    data.rent,
-    data.utilities,
-    data.salaries,
-    data.otherFixed,
-    data.profit
+    Math.round(data.foodCost),
+    Math.round(data.rent),
+    Math.round(data.utilities),
+    Math.round(data.salaries),
+    Math.round(data.otherFixed),
+    Math.round(data.profit)
   ];
   expenseChart.update();
 
   // 初期投資内訳チャートの更新
   investmentChart.data.datasets[0].data = [
-    data.renovation,
-    data.equipment,
-    data.furniture,
-    data.deposit,
-    data.otherInitial
+    Math.round(data.renovation),
+    Math.round(data.equipment),
+    Math.round(data.furniture),
+    Math.round(data.deposit),
+    Math.round(data.otherInitial)
   ];
   investmentChart.update();
 
-  // 損益分岐点チャートの更新
-  breakevenChart.data.labels = data.customerLabels;
-  breakevenChart.data.datasets[0].data = data.revenueData;
-  breakevenChart.data.datasets[1].data = data.fixedCostData;
-  breakevenChart.data.datasets[2].data = data.variableCostData;
-  breakevenChart.data.datasets[3].data = data.breakevenLine;
-  breakevenChart.update();
-
   // 投資回収シミュレーションチャートの更新
-  paybackChart.data.datasets[0].data = data.cumulativeProfits;
-  paybackChart.data.datasets[1].data = data.investmentLine;
+  paybackChart.data.datasets[0].data = data.cumulativeProfits.map(Math.round);
+  paybackChart.data.datasets[1].data = data.investmentLine.map(Math.round);
   paybackChart.update();
 } 
