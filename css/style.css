@@ -208,25 +208,37 @@ th {
 }
 
 .rating {
-  display: inline-block;
-  padding: 4px 8px;
+  font-weight: bold;
+  padding: 2px 8px;
   border-radius: 4px;
   font-size: 0.9em;
 }
 
 .rating.positive {
-  background: #e8f5e9;
-  color: #2e7d32;
+  color: #2ecc71;
+  background-color: rgba(46, 204, 113, 0.1);
 }
 
-.rating.warning {
-  background: #fff3e0;
-  color: #ef6c00;
+.rating.negative {
+  color: #e74c3c;
+  background-color: rgba(231, 76, 60, 0.1);
 }
 
 .rating.neutral {
-  background: #f5f5f5;
-  color: #616161;
+  color: #3498db;
+  background-color: rgba(52, 152, 219, 0.1);
+}
+
+.positive {
+  color: #2ecc71;
+}
+
+.negative {
+  color: #e74c3c;
+}
+
+.warning {
+  color: #f39c12;
 }
 
 .divider {
@@ -261,4 +273,10 @@ th {
   .chart-inner {
     height: 200px;
   }
+}
+
+/* 分析セクションのスタイル */
+.analysis-section p {
+  margin: 8px 0;
+  line-height: 1.6;
 } 

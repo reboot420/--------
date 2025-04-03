@@ -44,7 +44,7 @@ function updateCalculations() {
     profitMargin: profit.margin,
     paybackPeriod: payback ? payback.months.toFixed(1) : "計算不可",
     paybackYears: payback ? `約${payback.years.toFixed(1)}年` : "",
-    roi: profit.monthly > 0 ? roi.toFixed(1) : "計算不可",
+    roi: roi,
     breakEvenPoint: breakEven.revenue,
     breakEvenCustomers: breakEven.customers,
     spendAdequacy: spendEvaluation,
@@ -84,37 +84,24 @@ function updateCalculations() {
 
 // 表示値の更新
 function updateDisplayValues(data) {
-  // 数値表示の更新
-  document.getElementById('total_investment').textContent = data.totalInvestment.toFixed(1);
-  document.getElementById('monthly_revenue').textContent = data.monthlyRevenue.toFixed(1);
-  document.getElementById('sales_per_day').textContent = `1日あたり ${data.dailySales.toFixed(1)}万円`;
-  
+  // メインメトリクスの更新
   const monthlyProfitElement = document.getElementById('monthly_profit');
-  monthlyProfitElement.textContent = data.monthlyProfit.toFixed(1);
-  monthlyProfitElement.className = "metric-value " + (data.monthlyProfit >= 0 ? "positive" : "negative");
-  
-  document.getElementById('profit_margin').textContent = 
-    data.profitMargin > 0 ? `利益率 ${data.profitMargin.toFixed(1)}%` : "赤字";
+  monthlyProfitElement.textContent = Math.round(data.monthlyProfit);
+  monthlyProfitElement.className = `metric-value ${data.monthlyProfit >= 0 ? 'positive' : 'negative'}`;
+
+  document.getElementById('total_investment').textContent = Math.round(data.totalInvestment);
+  document.getElementById('monthly_revenue').textContent = Math.round(data.monthlyRevenue);
+  document.getElementById('sales_per_day').textContent = `1日あたり${Math.round(data.dailySales)}万円`;
+  document.getElementById('profit_margin').textContent = `利益率${data.profitMargin.toFixed(1)}%`;
   
   const paybackElement = document.getElementById('payback_period');
   paybackElement.textContent = data.paybackPeriod;
-  paybackElement.className = "metric-value " + 
-    (data.monthlyProfit <= 0 ? "negative" : (data.paybackPeriod > 36 ? "warning" : "positive"));
+  paybackElement.className = `metric-value ${data.monthlyProfit <= 0 ? 'negative' : (parseFloat(data.paybackPeriod) > 36 ? 'warning' : 'positive')}`;
   
   document.getElementById('payback_years').textContent = data.paybackYears;
+  document.getElementById('roi').textContent = data.roi;
   
-  const roiElement = document.getElementById('roi');
-  roiElement.textContent = data.roi;
-  roiElement.className = "metric-value " + 
-    (data.monthlyProfit <= 0 ? "negative" : (data.roi < 10 ? "warning" : "positive"));
-  
-  const breakevenElement = document.getElementById('breakeven_point');
-  breakevenElement.textContent = isNaN(data.breakEvenPoint) ? "計算不可" : data.breakEvenPoint.toFixed(1);
-  
-  document.getElementById('breakeven_customers').textContent = 
-    isNaN(data.breakEvenCustomers) ? "" : `必要客数: 1日${data.breakEvenCustomers}人`;
-  
-  // 詳細分析表示の更新
+  // 詳細分析の更新
   document.getElementById('spend_adequacy').textContent = data.spendAdequacy.text;
   document.getElementById('spend_rating').innerHTML = data.spendAdequacy.rating;
   
@@ -130,7 +117,7 @@ function updateDisplayValues(data) {
   document.getElementById('rent_ratio').textContent = `${data.rentRatio.toFixed(1)}%`;
   document.getElementById('rent_rating').innerHTML = data.rentRating;
   
-  document.getElementById('total_monthly_cost').textContent = `${data.totalMonthlyCost.toFixed(1)}万円`;
+  document.getElementById('total_monthly_cost').textContent = `${Math.round(data.totalMonthlyCost)}万円`;
   document.getElementById('cost_rating').innerHTML = data.costRating;
   
   document.getElementById('analysis_result').innerHTML = data.analysisSummary;

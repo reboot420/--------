@@ -40,7 +40,7 @@ function evaluateSpendPerCustomer(spend) {
   if (spend < 1000) {
     return {
       text: "客単価が低めです",
-      rating: '<span class="rating warning">要改善</span>'
+      rating: '<span class="rating negative">要改善</span>'
     };
   } else if (spend > 5000) {
     return {
@@ -60,7 +60,7 @@ function evaluateTurnover(turnover) {
   if (turnover < 1.5) {
     return {
       text: "回転率が低いです",
-      rating: '<span class="rating warning">要改善</span>'
+      rating: '<span class="rating negative">要改善</span>'
     };
   } else if (turnover > 3) {
     return {
@@ -80,7 +80,7 @@ function evaluateSeatUtilization(utilization) {
   if (utilization < 50) {
     return {
       text: `稼働率${utilization.toFixed(1)}%で低めです`,
-      rating: '<span class="rating warning">要改善</span>'
+      rating: '<span class="rating negative">要改善</span>'
     };
   } else if (utilization > 80) {
     return {
@@ -98,7 +98,7 @@ function evaluateSeatUtilization(utilization) {
 // 人件費率の評価
 function evaluateLaborCost(ratio) {
   if (ratio > 35) {
-    return '<span class="rating warning">高い</span>';
+    return '<span class="rating negative">高い</span>';
   } else if (ratio < 25) {
     return '<span class="rating positive">適正</span>';
   } else {
@@ -109,7 +109,7 @@ function evaluateLaborCost(ratio) {
 // 家賃比率の評価
 function evaluateRentRatio(ratio) {
   if (ratio > 15) {
-    return '<span class="rating warning">高い</span>';
+    return '<span class="rating negative">高い</span>';
   } else if (ratio < 8) {
     return '<span class="rating positive">適正</span>';
   } else {
@@ -120,7 +120,7 @@ function evaluateRentRatio(ratio) {
 // コスト比率の評価
 function evaluateCostRatio(ratio) {
   if (ratio > 90) {
-    return '<span class="rating warning">高い</span>';
+    return '<span class="rating negative">高い</span>';
   } else if (ratio < 80) {
     return '<span class="rating positive">適正</span>';
   } else {
@@ -139,20 +139,20 @@ function generateAnalysisSummary(monthlyProfit, profitMargin, paybackPeriod, sea
   } else if (paybackPeriod !== "計算不可" && parseFloat(paybackPeriod) > 36) {
     analysis = `<p class="warning">投資回収に時間がかかります（${paybackPeriod}ヶ月）。初期投資の見直しもしくは収益性の向上が望ましいです。</p>`;
   } else {
-    analysis = `<p class="positive">収益性は良好です。月間${monthlyProfit.toFixed(1)}万円の利益が見込まれ、投資回収は${paybackPeriod}ヶ月で完了する見込みです。</p>`;
+    analysis = `<p class="positive">収益性は良好です。月間${Math.round(monthlyProfit)}万円の利益が見込まれ、投資回収は${paybackPeriod}ヶ月で完了する見込みです。</p>`;
   }
 
   // 追加の分析
   if (seatUtilization < 60) {
-    analysis += `<p>座席稼働率が${seatUtilization.toFixed(1)}%と低めです。マーケティング強化や提供時間の工夫で集客を増やすことを検討してください。</p>`;
+    analysis += `<p class="warning">座席稼働率が${seatUtilization.toFixed(1)}%と低めです。マーケティング強化や提供時間の工夫で集客を増やすことを検討してください。</p>`;
   }
 
   if (laborCostRatio > 30) {
-    analysis += `<p>人件費率が${laborCostRatio.toFixed(1)}%と高めです。オペレーション効率化やシフト最適化を検討してください。</p>`;
+    analysis += `<p class="warning">人件費率が${laborCostRatio.toFixed(1)}%と高めです。オペレーション効率化やシフト最適化を検討してください。</p>`;
   }
 
   if (foodCostRate > 40) {
-    analysis += `<p>食材費率が${foodCostRate}%と高めです。メニュー構成や仕入れの見直しが有効かもしれません。</p>`;
+    analysis += `<p class="warning">食材費率が${foodCostRate}%と高めです。メニュー構成や仕入れの見直しが有効かもしれません。</p>`;
   }
 
   return analysis;

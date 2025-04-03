@@ -99,7 +99,8 @@ function calculatePaybackPeriod(initialInvestment, monthlyProfit) {
 
 // ROIの計算
 function calculateROI(annualProfit, initialInvestment) {
-  return (annualProfit / initialInvestment) * 100;
+  if (initialInvestment <= 0 || annualProfit <= 0) return "計算不可";
+  return ((annualProfit / initialInvestment) * 100).toFixed(1);
 }
 
 // 損益分岐点の計算
