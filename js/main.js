@@ -445,4 +445,189 @@ document.addEventListener('DOMContentLoaded', function() {
   } catch (error) {
     console.error('初期化エラー:', error);
   }
+});
+
+// トースト通知を表示する関数
+function showToast(message, type = 'success') {
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `
+    <div class="toast-content">
+      <span class="toast-icon"></span>
+      <span class="toast-message">${message}</span>
+    </div>
+  `;
+  document.body.appendChild(toast);
+  
+  // アニメーションのためにタイミングをずらす
+  setTimeout(() => toast.classList.add('show'), 10);
+  
+  // 3秒後に非表示
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// 現在の入力データを取得
+function getCurrentInputData() {
+  const inputs = {};
+  const inputFields = document.querySelectorAll('input[type="number"]');
+  inputFields.forEach(input => {
+    inputs[input.id] = parseFloat(input.value) || 0;
+  });
+  return inputs;
+}
+
+// 保存ボタンのクリックハンドラ
+document.getElementById('savePlan').addEventListener('click', () => {
+  const currentData = getCurrentInputData();
+  const totalInvestment = calculateTotalInvestment();
+  const monthlyRevenue = calculateMonthlyRevenue();
+  const monthlyProfit = calculateMonthlyProfit();
+  
+  // 保存モーダルを表示
+  const saveModal = document.getElementById('saveModal');
+  const summaryElement = document.querySelector('.save-summary');
+  summaryElement.innerHTML = `
+    <div class="summary-item">
+      <div class="summary-label">初期投資合計</div>
+      <div class="summary-value">${totalInvestment.toLocaleString()}万円</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-label">月間売上</div>
+      <div class="summary-value">${monthlyRevenue.toLocaleString()}万円</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-label">月間利益</div>
+      <div class="summary-value">${monthlyProfit.toLocaleString()}万円</div>
+    </div>
+  `;
+  saveModal.style.display = 'block';
+});
+
+// 保存の確認
+document.getElementById('saveConfirm').addEventListener('click', () => {
+  const planName = document.getElementById('planName').value.trim();
+  if (!planName) {
+    showToast('事業計画名を入力してください', 'error');
+    return;
+  }
+  
+  const currentData = getCurrentInputData();
+  const savedPlans = JSON.parse(localStorage.getItem('savedPlans') || '[]');
+  const newPlan = {
+    id: Date.now(),
+    name: planName,
+    memo: document.getElementById('planMemo').value.trim(),
+    data: currentData,
+    date: new Date().toISOString()
+  };
+  
+  savedPlans.push(newPlan);
+  localStorage.setItem('savedPlans', JSON.stringify(savedPlans));
+  
+  document.getElementById('saveModal').style.display = 'none';
+  document.getElementById('planName').value = '';
+  document.getElementById('planMemo').value = '';
+  
+  showToast('事業計画を保存しました');
+});
+
+// 編集ボタンのクリックハンドラ
+document.getElementById('editPlans').addEventListener('click', () => {
+  const savedPlans = JSON.parse(localStorage.getItem('savedPlans') || '[]');
+  const historyList = document.getElementById('historyList');
+  const editModal = document.getElementById('editModal');
+  
+  if (savedPlans.length === 0) {
+    historyList.innerHTML = '<div class="empty-history-message">保存された事業計画はありません</div>';
+  } else {
+    historyList.innerHTML = savedPlans.map(plan => `
+      <div class="history-item" data-id="${plan.id}">
+        <div class="history-header">
+          <div class="history-title">
+            <div class="history-name">${plan.name}</div>
+            <div class="history-date">${new Date(plan.date).toLocaleString()}</div>
+          </div>
+        </div>
+        <div class="history-summary">
+          <div class="history-summary-item">
+            <div class="history-summary-label">初期投資合計</div>
+            <div class="history-summary-value">${calculateTotalInvestment(plan.data).toLocaleString()}万円</div>
+          </div>
+          <div class="history-summary-item">
+            <div class="history-summary-label">月間売上</div>
+            <div class="history-summary-value">${calculateMonthlyRevenue(plan.data).toLocaleString()}万円</div>
+          </div>
+          <div class="history-summary-item">
+            <div class="history-summary-label">月間利益</div>
+            <div class="history-summary-value">${calculateMonthlyProfit(plan.data).toLocaleString()}万円</div>
+          </div>
+        </div>
+        ${plan.memo ? `<div class="history-memo">${plan.memo}</div>` : ''}
+        <div class="history-actions">
+          <button class="btn btn-primary load-plan" data-id="${plan.id}">読み込む</button>
+          <button class="btn btn-danger delete-plan" data-id="${plan.id}">削除</button>
+        </div>
+      </div>
+    `).join('');
+  }
+  
+  editModal.style.display = 'block';
+});
+
+// 保存プランの読み込み
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('load-plan')) {
+    const planId = parseInt(e.target.dataset.id);
+    const savedPlans = JSON.parse(localStorage.getItem('savedPlans') || '[]');
+    const plan = savedPlans.find(p => p.id === planId);
+    
+    if (plan) {
+      Object.entries(plan.data).forEach(([id, value]) => {
+        const input = document.getElementById(id);
+        if (input) input.value = value;
+      });
+      
+      document.getElementById('editModal').style.display = 'none';
+      updateCalculations();
+      showToast('事業計画を読み込みました');
+    }
+  }
+});
+
+// 保存プランの削除
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('delete-plan')) {
+    if (confirm('この事業計画を削除してもよろしいですか？')) {
+      const planId = parseInt(e.target.dataset.id);
+      const savedPlans = JSON.parse(localStorage.getItem('savedPlans') || '[]');
+      const updatedPlans = savedPlans.filter(p => p.id !== planId);
+      
+      localStorage.setItem('savedPlans', JSON.stringify(updatedPlans));
+      e.target.closest('.history-item').remove();
+      
+      if (updatedPlans.length === 0) {
+        document.getElementById('historyList').innerHTML = 
+          '<div class="empty-history-message">保存された事業計画はありません</div>';
+      }
+      
+      showToast('事業計画を削除しました');
+    }
+  }
+});
+
+// モーダルを閉じる
+document.querySelectorAll('.modal .close').forEach(closeBtn => {
+  closeBtn.addEventListener('click', () => {
+    closeBtn.closest('.modal').style.display = 'none';
+  });
+});
+
+// モーダル外クリックで閉じる
+window.addEventListener('click', e => {
+  if (e.target.classList.contains('modal')) {
+    e.target.style.display = 'none';
+  }
 }); 
