@@ -201,7 +201,101 @@ function updateCharts(data) {
   investmentChart.update();
 
   // 投資回収シミュレーションチャートの更新
-  paybackChart.data.datasets[0].data = data.cumulativeProfits.map(Math.round);
-  paybackChart.data.datasets[1].data = data.investmentLine.map(Math.round);
+  updatePaybackChart(data);
+}
+
+// 投資回収シミュレーションチャートの更新
+function updatePaybackChart(data) {
+  if (!paybackChart) return;
+  
+  // 10年分のラベルを生成
+  const labels = Array.from({length: 11}, (_, i) => `${i}年目`);
+  
+  // 累積利益の計算
+  const cumulativeProfits = data.cumulativeProfits;
+  const initialInvestment = data.investmentLine[0];
+  
+  // 損益の計算（累積利益 - 初期投資）
+  const profitLoss = cumulativeProfits.map(profit => profit - initialInvestment);
+  
+  paybackChart.data.labels = labels;
+  paybackChart.data.datasets = [
+    {
+      label: '累積利益',
+      data: cumulativeProfits,
+      borderColor: '#2ecc71',
+      backgroundColor: 'rgba(46, 204, 113, 0.1)',
+      borderWidth: 2,
+      fill: true,
+      tension: 0.4
+    },
+    {
+      label: '初期投資額',
+      data: data.investmentLine,
+      borderColor: '#e74c3c',
+      borderWidth: 2,
+      borderDash: [5, 5],
+      fill: false,
+      pointRadius: 0
+    },
+    {
+      label: '損益',
+      data: profitLoss,
+      borderColor: '#3498db',
+      backgroundColor: 'rgba(52, 152, 219, 0.1)',
+      borderWidth: 2,
+      fill: true,
+      tension: 0.4
+    }
+  ];
+  
+  paybackChart.options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      tooltip: {
+        mode: 'index',
+        intersect: false,
+        callbacks: {
+          label: function(context) {
+            let label = context.dataset.label || '';
+            if (label) {
+              label += ': ';
+            }
+            if (context.parsed.y !== null) {
+              label += Math.round(context.parsed.y) + '万円';
+            }
+            return label;
+          }
+        }
+      },
+      legend: {
+        position: 'top',
+        labels: {
+          font: {
+            size: 12
+          }
+        }
+      },
+      datalabels: {
+        display: false
+      }
+    },
+    scales: {
+      x: {
+        grid: {
+          display: false
+        }
+      },
+      y: {
+        ticks: {
+          callback: function(value) {
+            return value + '万円';
+          }
+        }
+      }
+    }
+  };
+  
   paybackChart.update();
 } 

@@ -181,4 +181,18 @@ function calculateRatios(inputs, revenue) {
     rent: (inputs.rent / revenue.monthly) * 100,
     foodCost: inputs.foodCostRate
   };
+}
+
+// 投資回収チャートのデータを計算
+function calculatePaybackChartData(annualProfit, years = 10) {
+  const cumulativeProfits = [];
+  let currentProfit = 0;
+  
+  // 0年目から10年目までの累積利益を計算
+  for (let i = 0; i <= years; i++) {
+    cumulativeProfits.push(Math.round(currentProfit));
+    currentProfit += annualProfit;
+  }
+  
+  return cumulativeProfits;
 } 

@@ -72,11 +72,8 @@ function updateCalculations() {
     furniture: initialInvestment.breakdown.furniture,
     deposit: initialInvestment.breakdown.deposit,
     otherInitial: initialInvestment.breakdown.otherInitial,
-    customerLabels: calculateBreakEvenChartLabels(inputs.customers),
-    revenueData: calculateBreakEvenChartData(inputs).revenueData,
-    costData: calculateBreakEvenChartData(inputs).costData,
-    cumulativeProfits: calculatePaybackChartData(profit.annual, 5),
-    investmentLine: Array(5).fill(initialInvestment.total)
+    cumulativeProfits: calculatePaybackChartData(profit.annual, 10),
+    investmentLine: Array(11).fill(initialInvestment.total)
   };
   
   updateCharts(chartData);
