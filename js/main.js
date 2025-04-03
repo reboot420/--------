@@ -480,35 +480,16 @@ function getCurrentInputData() {
 }
 
 // 保存ボタンのクリックハンドラ
-document.getElementById('savePlan').addEventListener('click', () => {
-  const currentData = getCurrentInputData();
-  const totalInvestment = calculateTotalInvestment();
-  const monthlyRevenue = calculateMonthlyRevenue();
-  const monthlyProfit = calculateMonthlyProfit();
-  
+document.getElementById('saveSnapshot').addEventListener('click', () => {
   // 保存モーダルを表示
   const saveModal = document.getElementById('saveModal');
-  const summaryElement = document.querySelector('.save-summary');
-  summaryElement.innerHTML = `
-    <div class="summary-item">
-      <div class="summary-label">初期投資合計</div>
-      <div class="summary-value">${totalInvestment.toLocaleString()}万円</div>
-    </div>
-    <div class="summary-item">
-      <div class="summary-label">月間売上</div>
-      <div class="summary-value">${monthlyRevenue.toLocaleString()}万円</div>
-    </div>
-    <div class="summary-item">
-      <div class="summary-label">月間利益</div>
-      <div class="summary-value">${monthlyProfit.toLocaleString()}万円</div>
-    </div>
-  `;
   saveModal.style.display = 'block';
+  document.getElementById('snapshotName').focus();
 });
 
 // 保存の確認
-document.getElementById('saveConfirm').addEventListener('click', () => {
-  const planName = document.getElementById('planName').value.trim();
+document.getElementById('saveSnapshotConfirm').addEventListener('click', () => {
+  const planName = document.getElementById('snapshotName').value.trim();
   if (!planName) {
     showToast('事業計画名を入力してください', 'error');
     return;
@@ -519,7 +500,6 @@ document.getElementById('saveConfirm').addEventListener('click', () => {
   const newPlan = {
     id: Date.now(),
     name: planName,
-    memo: document.getElementById('planMemo').value.trim(),
     data: currentData,
     date: new Date().toISOString()
   };
@@ -528,17 +508,16 @@ document.getElementById('saveConfirm').addEventListener('click', () => {
   localStorage.setItem('savedPlans', JSON.stringify(savedPlans));
   
   document.getElementById('saveModal').style.display = 'none';
-  document.getElementById('planName').value = '';
-  document.getElementById('planMemo').value = '';
+  document.getElementById('snapshotName').value = '';
   
   showToast('事業計画を保存しました');
 });
 
 // 編集ボタンのクリックハンドラ
-document.getElementById('editPlans').addEventListener('click', () => {
+document.getElementById('showHistory').addEventListener('click', () => {
   const savedPlans = JSON.parse(localStorage.getItem('savedPlans') || '[]');
   const historyList = document.getElementById('historyList');
-  const editModal = document.getElementById('editModal');
+  const editModal = document.getElementById('historyModal');
   
   if (savedPlans.length === 0) {
     historyList.innerHTML = '<div class="empty-history-message">保存された事業計画はありません</div>';
@@ -551,21 +530,6 @@ document.getElementById('editPlans').addEventListener('click', () => {
             <div class="history-date">${new Date(plan.date).toLocaleString()}</div>
           </div>
         </div>
-        <div class="history-summary">
-          <div class="history-summary-item">
-            <div class="history-summary-label">初期投資合計</div>
-            <div class="history-summary-value">${calculateTotalInvestment(plan.data).toLocaleString()}万円</div>
-          </div>
-          <div class="history-summary-item">
-            <div class="history-summary-label">月間売上</div>
-            <div class="history-summary-value">${calculateMonthlyRevenue(plan.data).toLocaleString()}万円</div>
-          </div>
-          <div class="history-summary-item">
-            <div class="history-summary-label">月間利益</div>
-            <div class="history-summary-value">${calculateMonthlyProfit(plan.data).toLocaleString()}万円</div>
-          </div>
-        </div>
-        ${plan.memo ? `<div class="history-memo">${plan.memo}</div>` : ''}
         <div class="history-actions">
           <button class="btn btn-primary load-plan" data-id="${plan.id}">読み込む</button>
           <button class="btn btn-danger delete-plan" data-id="${plan.id}">削除</button>
@@ -587,12 +551,30 @@ document.addEventListener('click', e => {
     if (plan) {
       Object.entries(plan.data).forEach(([id, value]) => {
         const input = document.getElementById(id);
-        if (input) input.value = value;
+        if (input) {
+          input.value = value;
+          // 入力欄の背景色を一時的に変更して視覚的フィードバックを提供
+          input.style.backgroundColor = '#e3f2fd';
+          setTimeout(() => {
+            input.style.backgroundColor = '';
+          }, 2000);
+        }
       });
       
-      document.getElementById('editModal').style.display = 'none';
+      // モーダルを閉じる
+      document.getElementById('historyModal').style.display = 'none';
+      
+      // 計算を更新
       updateCalculations();
-      showToast('事業計画を読み込みました');
+      
+      // 読み込んだプラン名を表示するトースト通知
+      showToast(`「${plan.name}」を読み込みました`);
+      
+      // 売上予測セクションまでスクロール
+      const salesSection = document.querySelector('.card:nth-child(3)');
+      if (salesSection) {
+        salesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
   }
 });
