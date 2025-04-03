@@ -104,117 +104,132 @@ function initCharts() {
   });
 
   // 投資回収シミュレーションチャート
-  const paybackCtx = document.getElementById('payback-chart').getContext('2d');
-  paybackChart = new Chart(paybackCtx, {
-    type: 'line',
-    data: {
-      labels: Array.from({length: 11}, (_, i) => `${i}年目`),
-      datasets: [
-        {
-          label: '損益',
-          data: [],
-          borderColor: '#3498db',
-          backgroundColor: 'rgba(52, 152, 219, 0.1)',
-          borderWidth: 2,
-          fill: true,
-          tension: 0.4
-        },
-        {
-          label: '初期投資額',
-          data: [],
-          borderColor: '#e74c3c',
-          borderWidth: 2,
-          borderDash: [5, 5],
-          fill: false,
-          pointRadius: 0
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        tooltip: {
-          mode: 'index',
-          intersect: false,
-          callbacks: {
-            label: function(context) {
-              return `${context.dataset.label}: ${Math.round(context.parsed.y)}万円`;
+  const paybackCtx = document.getElementById('payback-chart');
+  if (paybackCtx) {
+    paybackChart = new Chart(paybackCtx, {
+      type: 'line',
+      data: {
+        labels: Array.from({length: 11}, (_, i) => `${i}年目`),
+        datasets: [
+          {
+            label: '損益',
+            data: [],
+            borderColor: '#3498db',
+            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4
+          },
+          {
+            label: '初期投資額',
+            data: [],
+            borderColor: '#e74c3c',
+            borderWidth: 2,
+            borderDash: [5, 5],
+            fill: false,
+            pointRadius: 0
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+            callbacks: {
+              label: function(context) {
+                return `${context.dataset.label}: ${Math.round(context.parsed.y)}万円`;
+              }
             }
+          },
+          legend: {
+            position: 'top'
+          },
+          datalabels: {
+            display: false
           }
         },
-        legend: {
-          position: 'top'
-        },
-        datalabels: {
-          display: false
-        }
-      },
-      scales: {
-        y: {
-          ticks: {
-            callback: function(value) {
-              return value + '万円';
+        scales: {
+          y: {
+            ticks: {
+              callback: function(value) {
+                return value + '万円';
+              }
             }
           }
         }
       }
-    }
-  });
+    });
+  }
 
   // 累積利益チャート
-  const cumulativeProfitCtx = document.getElementById('cumulative-profit-chart').getContext('2d');
-  cumulativeProfitChart = new Chart(cumulativeProfitCtx, {
-    type: 'bar',
-    data: {
-      labels: Array.from({length: 11}, (_, i) => `${i}年目`),
-      datasets: [{
-        label: '累積利益',
-        data: [],
-        backgroundColor: 'rgba(46, 204, 113, 0.8)',
-        borderColor: 'rgba(46, 204, 113, 1)',
-        borderWidth: 1,
-        barThickness: 20
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              return `累積利益: ${Math.round(context.parsed.x)}万円`;
+  const cumulativeProfitCtx = document.getElementById('cumulative-profit-chart');
+  if (cumulativeProfitCtx) {
+    cumulativeProfitChart = new Chart(cumulativeProfitCtx, {
+      type: 'bar',
+      data: {
+        labels: Array.from({length: 11}, (_, i) => `${i}年目`),
+        datasets: [{
+          label: '累積利益',
+          data: [],
+          backgroundColor: 'rgba(46, 204, 113, 0.8)',
+          borderColor: 'rgba(46, 204, 113, 1)',
+          borderWidth: 1,
+          barThickness: 30
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return `累積利益: ${Math.round(context.parsed.x)}万円`;
+              }
+            }
+          },
+          legend: {
+            display: false
+          },
+          datalabels: {
+            anchor: 'end',
+            align: 'right',
+            offset: 4,
+            formatter: function(value) {
+              return Math.round(value) + '万円';
+            },
+            color: 'black',
+            font: {
+              weight: 'bold',
+              size: 11
             }
           }
         },
-        legend: {
-          display: false
-        },
-        datalabels: {
-          anchor: 'end',
-          align: 'right',
-          formatter: function(value) {
-            return Math.round(value) + '万円';
+        scales: {
+          x: {
+            grid: {
+              display: true,
+              drawBorder: true,
+            },
+            ticks: {
+              callback: function(value) {
+                return value + '万円';
+              }
+            }
           },
-          color: 'black',
-          font: {
-            weight: 'bold'
-          }
-        }
-      },
-      scales: {
-        x: {
-          ticks: {
-            callback: function(value) {
-              return value + '万円';
+          y: {
+            grid: {
+              display: false
             }
           }
         }
       }
-    }
-  });
+    });
+  }
 }
 
 // グラフの更新
@@ -241,10 +256,14 @@ function updateCharts(data) {
   investmentChart.update();
 
   // 投資回収シミュレーションチャートの更新
-  updatePaybackChart(data);
+  if (paybackChart) {
+    updatePaybackChart(data);
+  }
   
   // 累積利益チャートの更新
-  updateCumulativeProfitChart(data);
+  if (cumulativeProfitChart) {
+    updateCumulativeProfitChart(data);
+  }
 }
 
 // 投資回収シミュレーションチャートの更新
