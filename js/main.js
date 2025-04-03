@@ -88,21 +88,40 @@ function updateDisplayValues(data) {
 
   // メインメトリクスの更新
   const monthlyProfitElement = document.getElementById('monthly_profit');
-  monthlyProfitElement.textContent = formatNumber(data.monthlyProfit);
+  const profitValue = formatNumber(data.monthlyProfit);
+  monthlyProfitElement.innerHTML = `${profitValue}<span class="unit">万円</span>`;
   monthlyProfitElement.className = `metric-value ${data.monthlyProfit >= 0 ? 'positive' : 'negative'}`;
 
-  document.getElementById('total_investment').textContent = formatNumber(data.totalInvestment);
-  document.getElementById('monthly_revenue').textContent = formatNumber(data.monthlyRevenue);
-  document.getElementById('sales_per_day').textContent = `1日あたり${formatNumber(data.dailySales)}万円`;
-  document.getElementById('profit_margin').textContent = `利益率${formatNumber(data.profitMargin)}%`;
-  
+  // 初期投資合計
+  document.getElementById('total_investment').innerHTML = 
+    `${formatNumber(data.totalInvestment)}<span class="unit">万円</span>`;
+
+  // 月間売上
+  document.getElementById('monthly_revenue').innerHTML = 
+    `${formatNumber(data.monthlyRevenue)}<span class="unit">万円</span>`;
+  document.getElementById('sales_per_day').textContent = 
+    `1日あたり${formatNumber(data.dailySales)}万円`;
+
+  // 月間利益と利益率
+  document.getElementById('profit_margin').textContent = 
+    `利益率${formatNumber(data.profitMargin)}%`;
+
+  // 投資回収期間
   const paybackElement = document.getElementById('payback_period');
-  paybackElement.textContent = formatNumber(data.paybackPeriod);
-  paybackElement.className = `metric-value ${data.monthlyProfit <= 0 ? 'negative' : (parseFloat(data.paybackPeriod) > 36 ? 'warning' : 'positive')}`;
-  
-  document.getElementById('payback_years').textContent = `約${formatNumber(data.paybackYears)}年`;
-  document.getElementById('roi').textContent = formatNumber(data.roi);
-  
+  paybackElement.innerHTML = 
+    `${formatNumber(data.paybackPeriod)}<span class="unit">ヶ月</span>`;
+  paybackElement.className = 
+    `metric-value ${data.monthlyProfit <= 0 ? 'negative' : (parseFloat(data.paybackPeriod) > 36 ? 'warning' : 'positive')}`;
+
+  // 投資回収期間（年）
+  const years = data.paybackPeriod / 12;
+  document.getElementById('payback_years').textContent = 
+    `約${years.toFixed(1)}年`;
+
+  // 投資利益率
+  document.getElementById('roi').innerHTML = 
+    `${formatNumber(data.roi)}<span class="unit">%</span>`;
+
   // 詳細分析の更新
   document.getElementById('spend_adequacy').textContent = data.spendAdequacy.text;
   document.getElementById('spend_rating').innerHTML = data.spendAdequacy.rating;
@@ -113,13 +132,16 @@ function updateDisplayValues(data) {
   document.getElementById('customer_fullfillment').textContent = data.customerFulfillment.text;
   document.getElementById('customer_rating').innerHTML = data.customerFulfillment.rating;
   
-  document.getElementById('labor_cost_ratio').textContent = `${formatNumber(data.laborCostRatio)}%`;
+  document.getElementById('labor_cost_ratio').textContent = 
+    `${formatNumber(data.laborCostRatio)}%`;
   document.getElementById('labor_rating').innerHTML = data.laborRating;
   
-  document.getElementById('rent_ratio').textContent = `${formatNumber(data.rentRatio)}%`;
+  document.getElementById('rent_ratio').textContent = 
+    `${formatNumber(data.rentRatio)}%`;
   document.getElementById('rent_rating').innerHTML = data.rentRating;
   
-  document.getElementById('total_monthly_cost').textContent = `${formatNumber(data.totalMonthlyCost)}万円`;
+  document.getElementById('total_monthly_cost').textContent = 
+    `${formatNumber(data.totalMonthlyCost)}万円`;
   document.getElementById('cost_rating').innerHTML = data.costRating;
   
   document.getElementById('analysis_result').innerHTML = data.analysisSummary;
