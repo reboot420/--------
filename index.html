@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>飲食店事業計画分析ツール</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/charts.css">
+</head>
+<body>
+  <h1>飲食店事業計画分析ツール</h1>
+  
+  <div class="card">
+    <h2>初期投資（万円）</h2>
+    <div class="form-group">
+      <label for="renovation">内装工事</label>
+      <div class="input-with-unit">
+        <input type="number" id="renovation" value="500">
+        <span class="unit-label">万円</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="equipment">厨房設備</label>
+      <div class="input-with-unit">
+        <input type="number" id="equipment" value="300">
+        <span class="unit-label">万円</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="furniture">家具・備品</label>
+      <div class="input-with-unit">
+        <input type="number" id="furniture" value="200">
+        <span class="unit-label">万円</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="deposit">保証金・敷金</label>
+      <div class="input-with-unit">
+        <input type="number" id="deposit" value="100">
+        <span class="unit-label">万円</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="other_initial">その他初期費用</label>
+      <div class="input-with-unit">
+        <input type="number" id="other_initial" value="100">
+        <span class="unit-label">万円</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="card">
+    <h2>月間固定費（万円）</h2>
+    <div class="form-group">
+      <label for="rent">家賃</label>
+      <div class="input-with-unit">
+        <input type="number" id="rent" value="20">
+        <span class="unit-label">万円</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="utilities">水道光熱費</label>
+      <div class="input-with-unit">
+        <input type="number" id="utilities" value="8">
+        <span class="unit-label">万円</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="salaries">人件費</label>
+      <div class="input-with-unit">
+        <input type="number" id="salaries" value="80">
+        <span class="unit-label">万円</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="other_fixed">その他固定費</label>
+      <div class="input-with-unit">
+        <input type="number" id="other_fixed" value="12">
+        <span class="unit-label">万円</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="card">
+    <h2>売上予測</h2>
+    <div class="form-group">
+      <label for="customers">1日平均客数</label>
+      <input type="number" id="customers" value="40">
+    </div>
+    <div class="form-group">
+      <label for="spend">客単価（円）</label>
+      <div class="input-with-unit">
+        <input type="number" id="spend" value="2000">
+        <span class="unit-label">円</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="days">営業日数/月</label>
+      <input type="number" id="days" value="26">
+    </div>
+    <div class="form-group">
+      <label for="food_cost">食材費率（%）</label>
+      <div class="input-with-unit">
+        <input type="number" id="food_cost" value="35">
+        <span class="unit-label">%</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="seats">座席数</label>
+      <input type="number" id="seats" value="30">
+    </div>
+    <div class="form-group">
+      <label for="turnover">平均回転率（回/日）</label>
+      <input type="number" id="turnover" value="2.5" step="0.1">
+    </div>
+  </div>
+  
+  <div class="result-section">
+    <div class="section-header">
+      <h2>事業計画分析結果</h2>
+    </div>
+    
+    <div class="key-metrics">
+      <div class="metric-card primary">
+        <div class="metric-title">初期投資合計</div>
+        <div class="metric-value neutral" id="total_investment">0<span class="unit">万円</span></div>
+        <div class="metric-subtitle">開業にかかる初期費用の総額</div>
+      </div>
+      <div class="metric-card primary">
+        <div class="metric-title">月間売上</div>
+        <div class="metric-value neutral" id="monthly_revenue">0<span class="unit">万円</span></div>
+        <div class="metric-subtitle" id="sales_per_day"></div>
+      </div>
+      <div class="metric-card success">
+        <div class="metric-title">月間利益</div>
+        <div class="metric-value" id="monthly_profit">0<span class="unit">万円</span></div>
+        <div class="metric-subtitle" id="profit_margin"></div>
+      </div>
+      <div class="metric-card warning">
+        <div class="metric-title">投資回収期間</div>
+        <div class="metric-value" id="payback_period">0<span class="unit">ヶ月</span></div>
+        <div class="metric-subtitle" id="payback_years"></div>
+      </div>
+      <div class="metric-card success">
+        <div class="metric-title">投資利益率（年間）</div>
+        <div class="metric-value" id="roi">0<span class="unit">%</span></div>
+        <div class="metric-subtitle">年間利益÷初期投資額</div>
+      </div>
+      <div class="metric-card warning">
+        <div class="metric-title">損益分岐点</div>
+        <div class="metric-value" id="breakeven_point">0<span class="unit">万円</span></div>
+        <div class="metric-subtitle" id="breakeven_customers"></div>
+      </div>
+    </div>
+    
+    <div class="grid-2x2">
+      <div class="chart-container">
+        <h3>月間収支内訳</h3>
+        <div class="chart-inner">
+          <canvas id="expense-chart"></canvas>
+        </div>
+      </div>
+      <div class="chart-container">
+        <h3>初期投資の内訳</h3>
+        <div class="chart-inner">
+          <canvas id="investment-chart"></canvas>
+        </div>
+      </div>
+      <div class="chart-container">
+        <h3>損益分岐点分析</h3>
+        <div class="chart-inner">
+          <canvas id="breakeven-chart"></canvas>
+        </div>
+      </div>
+      <div class="chart-container">
+        <h3>5年間の投資回収シミュレーション</h3>
+        <div class="chart-inner">
+          <canvas id="payback-chart"></canvas>
+        </div>
+      </div>
+    </div>
+    
+    <div class="additional-metrics">
+      <div class="data-card">
+        <div class="data-card-header">詳細分析</div>
+        <div class="data-card-body">
+          <table>
+            <thead>
+              <tr>
+                <th>指標</th>
+                <th>値</th>
+                <th>評価</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>客単価適正度</td>
+                <td id="spend_adequacy">分析中...</td>
+                <td id="spend_rating">-</td>
+              </tr>
+              <tr>
+                <td>座席回転率</td>
+                <td id="seat_turnover">分析中...</td>
+                <td id="turnover_rating">-</td>
+              </tr>
+              <tr>
+                <td>客数充足率</td>
+                <td id="customer_fullfillment">分析中...</td>
+                <td id="customer_rating">-</td>
+              </tr>
+              <tr>
+                <td>人件費率</td>
+                <td id="labor_cost_ratio">分析中...</td>
+                <td id="labor_rating">-</td>
+              </tr>
+              <tr>
+                <td>家賃負担率</td>
+                <td id="rent_ratio">分析中...</td>
+                <td id="rent_rating">-</td>
+              </tr>
+              <tr>
+                <td>月間総コスト</td>
+                <td id="total_monthly_cost">分析中...</td>
+                <td id="cost_rating">-</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="divider"></div>
+          
+          <h3>シミュレーション結果</h3>
+          <p class="small-text">標準的な飲食店の経営指標との比較に基づいた評価です。業態やロケーションによって適正値は変動します。</p>
+          
+          <div id="analysis_result">
+            <p>データを入力すると、詳細な分析結果が表示されます。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    ※ このツールは概算の事業計画策定を支援するものです。実際の開業には専門家の助言を得ることをお勧めします。
+  </div>
+
+  <script src="js/calculations.js"></script>
+  <script src="js/analysis.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
