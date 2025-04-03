@@ -85,18 +85,23 @@ function updateDisplayValues(data) {
   const monthlyProfitElement = document.getElementById('monthly_profit');
   monthlyProfitElement.textContent = Math.round(data.monthlyProfit);
   monthlyProfitElement.className = `metric-value ${data.monthlyProfit >= 0 ? 'positive' : 'negative'}`;
+  monthlyProfitElement.innerHTML = `${Math.round(data.monthlyProfit)}<span class="unit">万円</span>`;
 
-  document.getElementById('total_investment').textContent = Math.round(data.totalInvestment);
-  document.getElementById('monthly_revenue').textContent = Math.round(data.monthlyRevenue);
+  const totalInvestmentElement = document.getElementById('total_investment');
+  totalInvestmentElement.innerHTML = `${Math.round(data.totalInvestment)}<span class="unit">万円</span>`;
+
+  const monthlyRevenueElement = document.getElementById('monthly_revenue');
+  monthlyRevenueElement.innerHTML = `${Math.round(data.monthlyRevenue)}<span class="unit">万円</span>`;
+
   document.getElementById('sales_per_day').textContent = `1日あたり${Math.round(data.dailySales)}万円`;
   document.getElementById('profit_margin').textContent = `利益率${data.profitMargin.toFixed(1)}%`;
   
   const paybackElement = document.getElementById('payback_period');
-  paybackElement.textContent = data.paybackPeriod;
+  paybackElement.innerHTML = `${data.paybackPeriod}<span class="unit">ヶ月</span>`;
   paybackElement.className = `metric-value ${data.monthlyProfit <= 0 ? 'negative' : (parseFloat(data.paybackPeriod) > 36 ? 'warning' : 'positive')}`;
   
   document.getElementById('payback_years').textContent = data.paybackYears;
-  document.getElementById('roi').textContent = data.roi;
+  document.getElementById('roi').innerHTML = `${data.roi}<span class="unit">%</span>`;
   
   // 詳細分析の更新
   document.getElementById('spend_adequacy').textContent = data.spendAdequacy.text;
@@ -511,6 +516,31 @@ document.getElementById('saveSnapshotConfirm').addEventListener('click', () => {
   document.getElementById('snapshotName').value = '';
   
   showToast('事業計画を保存しました');
+  
+  // 保存後に編集モーダルの内容を更新
+  const historyList = document.getElementById('historyList');
+  if (savedPlans.length === 1) {
+    // 最初の保存の場合、空のメッセージを削除
+    historyList.innerHTML = '';
+  }
+  
+  // 新しい履歴アイテムを追加
+  const newHistoryItem = document.createElement('div');
+  newHistoryItem.className = 'history-item';
+  newHistoryItem.dataset.id = newPlan.id;
+  newHistoryItem.innerHTML = `
+    <div class="history-header">
+      <div class="history-title">
+        <div class="history-name">${newPlan.name}</div>
+        <div class="history-date">${new Date(newPlan.date).toLocaleString()}</div>
+      </div>
+    </div>
+    <div class="history-actions">
+      <button class="btn btn-primary load-plan" data-id="${newPlan.id}">読み込む</button>
+      <button class="btn btn-danger delete-plan" data-id="${newPlan.id}">削除</button>
+    </div>
+  `;
+  historyList.appendChild(newHistoryItem);
 });
 
 // 編集ボタンのクリックハンドラ
