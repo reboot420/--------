@@ -6,97 +6,105 @@ Chart.register(ChartDataLabels);
 
 // グラフの初期化
 function initCharts() {
-  initExpenseChart();
-  initInvestmentChart();
-  initBreakevenChart();
-  initPaybackChart();
-}
-
-// 月間収支内訳のグラフ初期化
-function initExpenseChart() {
+  // 支出内訳チャート
   const expenseCtx = document.getElementById('expense-chart').getContext('2d');
   expenseChart = new Chart(expenseCtx, {
-    type: 'pie',
+    type: 'doughnut',
     data: {
-      labels: ['食材費', '家賃', '水道光熱費', '人件費', 'その他固定費', '営業利益'],
+      labels: ['食材費', '家賃', '水道光熱費', '人件費', 'その他固定費', '利益'],
       datasets: [{
         data: [0, 0, 0, 0, 0, 0],
         backgroundColor: [
-          'rgba(255, 152, 0, 0.8)',  // 食材費
-          'rgba(76, 175, 80, 0.8)',  // 家賃
-          'rgba(33, 150, 243, 0.8)', // 水道光熱費
-          'rgba(156, 39, 176, 0.8)', // 人件費
-          'rgba(96, 125, 139, 0.8)', // その他固定費
-          'rgba(40, 167, 69, 0.8)',  // 利益
-        ],
-        borderColor: 'white',
-        borderWidth: 2
+          'rgba(255, 99, 132, 0.8)',
+          'rgba(54, 162, 235, 0.8)',
+          'rgba(255, 206, 86, 0.8)',
+          'rgba(75, 192, 192, 0.8)',
+          'rgba(153, 102, 255, 0.8)',
+          'rgba(76, 175, 80, 0.8)'
+        ]
       }]
     },
-    options: getExpenseChartOptions()
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'right'
+        }
+      }
+    }
   });
-}
 
-// 初期投資内訳のグラフ初期化
-function initInvestmentChart() {
+  // 初期投資内訳チャート
   const investmentCtx = document.getElementById('investment-chart').getContext('2d');
   investmentChart = new Chart(investmentCtx, {
-    type: 'doughnut',
+    type: 'pie',
     data: {
-      labels: ['内装工事', '厨房設備', '家具・備品', '保証金・敷金', 'その他'],
+      labels: ['内装工事', '厨房設備', '家具・備品', '保証金・敷金', 'その他初期費用'],
       datasets: [{
         data: [0, 0, 0, 0, 0],
         backgroundColor: [
-          'rgba(233, 30, 99, 0.8)',
-          'rgba(63, 81, 181, 0.8)',
-          'rgba(0, 188, 212, 0.8)',
-          'rgba(139, 195, 74, 0.8)',
-          'rgba(255, 87, 34, 0.8)'
-        ],
-        borderColor: 'white',
-        borderWidth: 2
+          'rgba(255, 99, 132, 0.8)',
+          'rgba(54, 162, 235, 0.8)',
+          'rgba(255, 206, 86, 0.8)',
+          'rgba(75, 192, 192, 0.8)',
+          'rgba(153, 102, 255, 0.8)'
+        ]
       }]
     },
-    options: getInvestmentChartOptions()
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'right'
+        }
+      }
+    }
   });
-}
 
-// 損益分岐点分析のグラフ初期化
-function initBreakevenChart() {
+  // 損益分岐点チャート
   const breakevenCtx = document.getElementById('breakeven-chart').getContext('2d');
   breakevenChart = new Chart(breakevenCtx, {
     type: 'line',
     data: {
-      labels: ['0', '20', '40', '60', '80', '100', '120', '140'],
+      labels: ['0', '10', '20', '30', '40', '50', '60', '70', '80'],
       datasets: [
         {
           label: '売上',
-          data: [0, 0, 0, 0, 0, 0, 0, 0],
-          borderColor: 'rgba(33, 150, 243, 1)',
-          backgroundColor: 'rgba(33, 150, 243, 0.1)',
-          borderWidth: 3,
-          fill: true,
-          tension: 0.1,
-          pointBackgroundColor: 'rgba(33, 150, 243, 1)'
+          data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+          borderColor: 'rgba(76, 175, 80, 1)',
+          backgroundColor: 'rgba(76, 175, 80, 0.1)',
+          fill: true
         },
         {
-          label: '費用合計',
-          data: [0, 0, 0, 0, 0, 0, 0, 0],
+          label: '総コスト',
+          data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
           borderColor: 'rgba(244, 67, 54, 1)',
           backgroundColor: 'rgba(244, 67, 54, 0.1)',
-          borderWidth: 3,
-          fill: true,
-          tension: 0.1,
-          pointBackgroundColor: 'rgba(244, 67, 54, 1)'
+          fill: true
         }
       ]
     },
-    options: getBreakevenChartOptions()
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: '金額（万円）'
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: '1日あたりの客数'
+          }
+        }
+      }
+    }
   });
-}
 
-// 投資回収シミュレーションのグラフ初期化
-function initPaybackChart() {
+  // 投資回収シミュレーションチャート
   const paybackCtx = document.getElementById('payback-chart').getContext('2d');
   paybackChart = new Chart(paybackCtx, {
     type: 'bar',
@@ -125,7 +133,18 @@ function initPaybackChart() {
         }
       ]
     },
-    options: getPaybackChartOptions()
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: '金額（万円）'
+          }
+        }
+      }
+    }
   });
 }
 
@@ -288,13 +307,7 @@ function getPaybackChartOptions() {
 
 // グラフの更新
 function updateCharts(data) {
-  updateExpenseChart(data);
-  updateInvestmentChart(data);
-  updateBreakevenChart(data);
-  updatePaybackChart(data);
-}
-
-function updateExpenseChart(data) {
+  // 支出内訳チャートの更新
   expenseChart.data.datasets[0].data = [
     data.foodCost,
     data.rent,
@@ -304,9 +317,8 @@ function updateExpenseChart(data) {
     data.profit
   ];
   expenseChart.update();
-}
 
-function updateInvestmentChart(data) {
+  // 初期投資内訳チャートの更新
   investmentChart.data.datasets[0].data = [
     data.renovation,
     data.equipment,
@@ -315,16 +327,14 @@ function updateInvestmentChart(data) {
     data.otherInitial
   ];
   investmentChart.update();
-}
 
-function updateBreakevenChart(data) {
+  // 損益分岐点チャートの更新
   breakevenChart.data.labels = data.customerLabels;
   breakevenChart.data.datasets[0].data = data.revenueData;
   breakevenChart.data.datasets[1].data = data.costData;
   breakevenChart.update();
-}
 
-function updatePaybackChart(data) {
+  // 投資回収シミュレーションチャートの更新
   paybackChart.data.datasets[0].data = data.cumulativeProfits;
   paybackChart.data.datasets[1].data = data.investmentLine;
   paybackChart.update();

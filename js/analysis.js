@@ -37,75 +37,60 @@ const EVALUATION_CRITERIA = {
 
 // 客単価の評価
 function evaluateSpendPerCustomer(spend) {
-  if (spend < EVALUATION_CRITERIA.spendPerCustomer.low) {
+  if (spend < 1000) {
     return {
-      text: "客単価が低すぎる可能性があります",
-      rating: "<span class='negative'>要改善</span>"
+      text: "客単価が低めです",
+      rating: '<span class="rating warning">要改善</span>'
     };
-  } else if (spend < EVALUATION_CRITERIA.spendPerCustomer.medium) {
+  } else if (spend > 5000) {
     return {
-      text: "客単価がやや低めです",
-      rating: "<span class='warning'>注意</span>"
-    };
-  } else if (spend > EVALUATION_CRITERIA.spendPerCustomer.high) {
-    return {
-      text: "客単価が高めです（業態による）",
-      rating: "<span class='positive'>良好</span>"
+      text: "客単価が高めです",
+      rating: '<span class="rating positive">良好</span>'
     };
   } else {
     return {
-      text: "客単価は標準的な範囲内です",
-      rating: "<span class='positive'>良好</span>"
+      text: "客単価は標準的です",
+      rating: '<span class="rating neutral">普通</span>'
     };
   }
 }
 
-// 座席回転率の評価
+// 回転率の評価
 function evaluateTurnover(turnover) {
-  if (turnover < EVALUATION_CRITERIA.turnover.low) {
+  if (turnover < 1.5) {
     return {
-      text: `${turnover}回転（改善の余地あり）`,
-      rating: "<span class='negative'>要改善</span>"
+      text: "回転率が低いです",
+      rating: '<span class="rating warning">要改善</span>'
     };
-  } else if (turnover < EVALUATION_CRITERIA.turnover.medium) {
+  } else if (turnover > 3) {
     return {
-      text: `${turnover}回転（一般的）`,
-      rating: "<span class='warning'>普通</span>"
-    };
-  } else if (turnover > EVALUATION_CRITERIA.turnover.high) {
-    return {
-      text: `${turnover}回転（非常に高い）`,
-      rating: "<span class='positive'>非常に良好</span>"
+      text: "回転率が高いです",
+      rating: '<span class="rating positive">良好</span>'
     };
   } else {
     return {
-      text: `${turnover}回転（良好）`,
-      rating: "<span class='positive'>良好</span>"
+      text: "回転率は標準的です",
+      rating: '<span class="rating neutral">普通</span>'
     };
   }
 }
 
 // 座席稼働率の評価
 function evaluateSeatUtilization(utilization) {
-  if (utilization < EVALUATION_CRITERIA.seatUtilization.low) {
+  if (utilization < 50) {
     return {
-      text: `${utilization.toFixed(1)}%（稼働率低）`,
-      rating: "<span class='negative'>要改善</span>"
+      text: `稼働率${utilization.toFixed(1)}%で低めです`,
+      rating: '<span class="rating warning">要改善</span>'
     };
-  } else if (utilization < EVALUATION_CRITERIA.seatUtilization.medium) {
+  } else if (utilization > 80) {
     return {
-      text: `${utilization.toFixed(1)}%（一般的）`,
-      rating: "<span class='warning'>普通</span>"
-    };
-  } else if (utilization > EVALUATION_CRITERIA.seatUtilization.high) {
-    return {
-      text: `${utilization.toFixed(1)}%（最大稼働）`,
-      rating: "<span class='positive'>非常に良好</span>"
+      text: `稼働率${utilization.toFixed(1)}%で高めです`,
+      rating: '<span class="rating positive">良好</span>'
     };
   } else {
     return {
-      text: `${utilization.toFixed(1)}%（良好）`,
-      rating: "<span class='positive'>良好</span>"
+      text: `稼働率${utilization.toFixed(1)}%で標準的です`,
+      rating: '<span class="rating neutral">普通</span>'
     };
   }
 }
@@ -113,39 +98,33 @@ function evaluateSeatUtilization(utilization) {
 // 人件費率の評価
 function evaluateLaborCost(ratio) {
   if (ratio > 35) {
-    return "<span class='negative'>高すぎる</span>";
-  } else if (ratio > 30) {
-    return "<span class='warning'>やや高い</span>";
-  } else if (ratio < 15) {
-    return "<span class='warning'>要確認</span>";
+    return '<span class="rating warning">高い</span>';
+  } else if (ratio < 25) {
+    return '<span class="rating positive">適正</span>';
   } else {
-    return "<span class='positive'>適正</span>";
+    return '<span class="rating neutral">普通</span>';
   }
 }
 
-// 家賃負担率の評価
+// 家賃比率の評価
 function evaluateRentRatio(ratio) {
   if (ratio > 15) {
-    return "<span class='negative'>高すぎる</span>";
-  } else if (ratio > 10) {
-    return "<span class='warning'>やや高い</span>";
-  } else if (ratio < 5) {
-    return "<span class='positive'>低め</span>";
+    return '<span class="rating warning">高い</span>';
+  } else if (ratio < 8) {
+    return '<span class="rating positive">適正</span>';
   } else {
-    return "<span class='positive'>適正</span>";
+    return '<span class="rating neutral">普通</span>';
   }
 }
 
-// 総コスト率の評価
+// コスト比率の評価
 function evaluateCostRatio(ratio) {
   if (ratio > 90) {
-    return "<span class='negative'>非常に高い</span>";
-  } else if (ratio > 80) {
-    return "<span class='warning'>やや高い</span>";
-  } else if (ratio < 60) {
-    return "<span class='positive'>低め</span>";
+    return '<span class="rating warning">高い</span>';
+  } else if (ratio < 80) {
+    return '<span class="rating positive">適正</span>';
   } else {
-    return "<span class='positive'>適正</span>";
+    return '<span class="rating neutral">普通</span>';
   }
 }
 

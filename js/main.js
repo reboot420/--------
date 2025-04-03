@@ -170,12 +170,25 @@ function calculatePaybackChartData(annualProfit, years) {
 // 初期化処理
 document.addEventListener('DOMContentLoaded', function() {
   // 初期化時に一度計算を実行
-  initCharts();
-  setTimeout(updateCalculations, 100); // 少し遅延を入れて確実にDOM要素が準備できてから実行
+  try {
+    console.log('初期化開始');
+    initCharts();
+    console.log('チャート初期化完了');
+    updateCalculations();
+    console.log('初期計算完了');
+  } catch (error) {
+    console.error('初期化エラー:', error);
+  }
   
   // 入力フィールドの変更イベントリスナーを設定
   const inputFields = document.querySelectorAll('input[type="number"]');
   inputFields.forEach(field => {
-    field.addEventListener('input', updateCalculations);
+    field.addEventListener('input', function() {
+      try {
+        updateCalculations();
+      } catch (error) {
+        console.error('計算更新エラー:', error);
+      }
+    });
   });
 }); 
