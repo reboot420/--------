@@ -83,16 +83,11 @@ function updateCalculations() {
 function updateDisplayValues(data) {
   // メインメトリクスの更新
   const monthlyProfitElement = document.getElementById('monthly_profit');
-  monthlyProfitElement.textContent = Math.round(data.monthlyProfit);
-  monthlyProfitElement.className = `metric-value ${data.monthlyProfit >= 0 ? 'positive' : 'negative'}`;
   monthlyProfitElement.innerHTML = `${Math.round(data.monthlyProfit)}<span class="unit">万円</span>`;
+  monthlyProfitElement.className = `metric-value ${data.monthlyProfit >= 0 ? 'positive' : 'negative'}`;
 
-  const totalInvestmentElement = document.getElementById('total_investment');
-  totalInvestmentElement.innerHTML = `${Math.round(data.totalInvestment)}<span class="unit">万円</span>`;
-
-  const monthlyRevenueElement = document.getElementById('monthly_revenue');
-  monthlyRevenueElement.innerHTML = `${Math.round(data.monthlyRevenue)}<span class="unit">万円</span>`;
-
+  document.getElementById('total_investment').innerHTML = `${Math.round(data.totalInvestment)}<span class="unit">万円</span>`;
+  document.getElementById('monthly_revenue').innerHTML = `${Math.round(data.monthlyRevenue)}<span class="unit">万円</span>`;
   document.getElementById('sales_per_day').textContent = `1日あたり${Math.round(data.dailySales)}万円`;
   document.getElementById('profit_margin').textContent = `利益率${data.profitMargin.toFixed(1)}%`;
   
@@ -236,7 +231,7 @@ function resetData() {
 // 履歴管理機能
 const historyManager = {
   // 履歴の保存
-  saveSnapshot: function(name, memo) {
+  saveSnapshot: function(name, memo = '') {
     const inputs = {
       renovation: document.getElementById('renovation').value,
       equipment: document.getElementById('equipment').value,
@@ -265,6 +260,12 @@ const historyManager = {
     let history = JSON.parse(localStorage.getItem('restaurantPlannerHistory') || '[]');
     history.push(snapshot);
     localStorage.setItem('restaurantPlannerHistory', JSON.stringify(history));
+    
+    // 保存成功のトースト表示
+    showToast('事業計画を保存しました', 'success');
+    
+    // 履歴一覧を更新
+    this.displayHistory();
   },
 
   // 履歴の読み込み
@@ -318,35 +319,15 @@ const historyManager = {
 
 // モーダル管理
 function initializeModals() {
-  const historyModal = document.getElementById('historyModal');
   const saveModal = document.getElementById('saveModal');
-  const dataManageBtn = document.getElementById('dataManageBtn');
+  const historyModal = document.getElementById('historyModal');
   const saveSnapshotBtn = document.getElementById('saveSnapshot');
   const showHistoryBtn = document.getElementById('showHistory');
   const saveSnapshotConfirmBtn = document.getElementById('saveSnapshotConfirm');
   const closeBtns = document.getElementsByClassName('close-btn');
   const modalCloseBtns = document.getElementsByClassName('modal-close');
 
-  // ドロップダウンメニューのイベント
-  document.addEventListener('click', function(event) {
-    if (!event.target.matches('#dataManageBtn') && !event.target.closest('.dropdown-content')) {
-      const dropdowns = document.getElementsByClassName('dropdown-content');
-      Array.from(dropdowns).forEach(dropdown => {
-        if (dropdown.style.display === 'block') {
-          dropdown.style.display = 'none';
-        }
-      });
-    }
-  });
-
-  // 履歴表示
-  showHistoryBtn.addEventListener('click', function(e) {
-    e.preventDefault();
-    historyModal.style.display = 'block';
-    historyManager.displayHistory();
-  });
-
-  // 保存モーダル表示
+  // 保存ボタンクリック
   saveSnapshotBtn.addEventListener('click', function(e) {
     e.preventDefault();
     saveModal.style.display = 'block';
@@ -356,41 +337,45 @@ function initializeModals() {
   // 保存実行
   saveSnapshotConfirmBtn.addEventListener('click', function() {
     const name = document.getElementById('snapshotName').value.trim();
-    const memo = document.getElementById('snapshotMemo').value.trim();
     
     if (!name) {
       const nameInput = document.getElementById('snapshotName');
       nameInput.classList.add('error');
       nameInput.focus();
+      showToast('事業計画名を入力してください', 'error');
       return;
     }
     
-    historyManager.saveSnapshot(name, memo);
+    historyManager.saveSnapshot(name);
     saveModal.style.display = 'none';
     document.getElementById('snapshotName').value = '';
-    document.getElementById('snapshotMemo').value = '';
+  });
+
+  // 履歴表示
+  showHistoryBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    historyModal.style.display = 'block';
+    historyManager.displayHistory();
   });
 
   // モーダルを閉じる
+  function closeModals() {
+    saveModal.style.display = 'none';
+    historyModal.style.display = 'none';
+  }
+
   Array.from(closeBtns).forEach(btn => {
-    btn.addEventListener('click', function() {
-      historyModal.style.display = 'none';
-      saveModal.style.display = 'none';
-    });
+    btn.addEventListener('click', closeModals);
   });
 
   Array.from(modalCloseBtns).forEach(btn => {
-    btn.addEventListener('click', function() {
-      historyModal.style.display = 'none';
-      saveModal.style.display = 'none';
-    });
+    btn.addEventListener('click', closeModals);
   });
 
   // モーダル外クリックで閉じる
   window.addEventListener('click', function(event) {
-    if (event.target === historyModal || event.target === saveModal) {
-      historyModal.style.display = 'none';
-      saveModal.style.display = 'none';
+    if (event.target === saveModal || event.target === historyModal) {
+      closeModals();
     }
   });
 
