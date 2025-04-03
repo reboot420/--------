@@ -64,41 +64,76 @@ function initCharts() {
   // 損益分岐点チャート
   const breakevenCtx = document.getElementById('breakeven-chart').getContext('2d');
   breakevenChart = new Chart(breakevenCtx, {
-    type: 'line',
+    type: 'bar',
     data: {
       labels: ['0', '10', '20', '30', '40', '50', '60', '70', '80'],
       datasets: [
         {
           label: '売上',
+          type: 'bar',
           data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+          backgroundColor: 'rgba(76, 175, 80, 0.6)',
           borderColor: 'rgba(76, 175, 80, 1)',
-          backgroundColor: 'rgba(76, 175, 80, 0.1)',
-          fill: true
+          borderWidth: 1,
+          order: 2
         },
         {
-          label: '総コスト',
+          label: '固定費',
+          type: 'bar',
           data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+          backgroundColor: 'rgba(244, 67, 54, 0.6)',
           borderColor: 'rgba(244, 67, 54, 1)',
-          backgroundColor: 'rgba(244, 67, 54, 0.1)',
-          fill: true
+          borderWidth: 1,
+          order: 2
+        },
+        {
+          label: '変動費',
+          type: 'bar',
+          data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+          backgroundColor: 'rgba(255, 152, 0, 0.6)',
+          borderColor: 'rgba(255, 152, 0, 1)',
+          borderWidth: 1,
+          order: 2
+        },
+        {
+          label: '損益分岐点',
+          type: 'line',
+          data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+          borderColor: 'rgba(156, 39, 176, 1)',
+          borderWidth: 2,
+          borderDash: [5, 5],
+          fill: false,
+          pointRadius: 0,
+          order: 1
         }
       ]
     },
     options: {
       responsive: true,
       scales: {
+        x: {
+          stacked: true,
+          title: {
+            display: true,
+            text: '1日あたりの客数'
+          }
+        },
         y: {
+          stacked: true,
           beginAtZero: true,
           title: {
             display: true,
             text: '金額（万円）'
           }
+        }
+      },
+      plugins: {
+        tooltip: {
+          mode: 'index',
+          intersect: false
         },
-        x: {
-          title: {
-            display: true,
-            text: '1日あたりの客数'
-          }
+        legend: {
+          position: 'top'
         }
       }
     }
@@ -331,7 +366,9 @@ function updateCharts(data) {
   // 損益分岐点チャートの更新
   breakevenChart.data.labels = data.customerLabels;
   breakevenChart.data.datasets[0].data = data.revenueData;
-  breakevenChart.data.datasets[1].data = data.costData;
+  breakevenChart.data.datasets[1].data = data.fixedCostData;
+  breakevenChart.data.datasets[2].data = data.variableCostData;
+  breakevenChart.data.datasets[3].data = data.breakevenLine;
   breakevenChart.update();
 
   // 投資回収シミュレーションチャートの更新

@@ -109,14 +109,61 @@ function calculateBreakEven(fixedCosts, variableCosts, revenue) {
   const variableCostRatio = variableCosts.total / revenue.monthly;
   const breakEvenRevenue = fixedCosts.total / (1 - variableCostRatio);
   
-  // revenueオブジェクトから1日あたりの顧客単価を計算
-  const dailyRevenue = revenue.daily;
-  const dailyCustomers = dailyRevenue > 0 ? revenue.daily / (revenue.monthly / (dailyRevenue * 26)) : 0;
-  const breakEvenCustomers = Math.ceil(breakEvenRevenue / (dailyRevenue / dailyCustomers));
+  // 1日あたりの売上から客数を逆算
+  const dailyBreakEvenRevenue = breakEvenRevenue / 26; // 営業日数で割る
+  const breakEvenCustomers = Math.ceil(dailyBreakEvenRevenue * 10000 / revenue.daily);
   
   return {
     revenue: breakEvenRevenue,
-    customers: breakEvenCustomers
+    customers: breakEvenCustomers,
+    variableCostRatio: variableCostRatio
+  };
+}
+
+// 損益分岐点グラフのラベル計算
+function calculateBreakEvenChartLabels(customers) {
+  const maxCustomers = Math.max(customers * 1.5, 80); // 現在の客数の1.5倍か80のどちらか大きい方
+  const step = Math.ceil(maxCustomers / 8);
+  return Array.from({length: 9}, (_, i) => (i * step).toString());
+}
+
+// 損益分岐点グラフのデータ計算
+function calculateBreakEvenChartData(inputs) {
+  const customerLabels = calculateBreakEvenChartLabels(inputs.customers);
+  const maxCustomers = parseInt(customerLabels[customerLabels.length - 1]);
+  const revenueData = [];
+  const fixedCostData = [];
+  const variableCostData = [];
+  const breakevenLine = [];
+  
+  // 固定費の計算
+  const monthlyFixedCosts = calculateFixedCosts(inputs).total;
+  const dailyFixedCosts = monthlyFixedCosts / inputs.days;
+  
+  // 変動費率の計算
+  const variableCostRate = inputs.foodCostRate / 100;
+  
+  // 損益分岐点の計算
+  const breakEvenPoint = monthlyFixedCosts / (1 - variableCostRate);
+  const dailyBreakEven = breakEvenPoint / inputs.days;
+  
+  customerLabels.forEach(label => {
+    const customers = parseInt(label);
+    const dailyRevenue = (customers * inputs.spend) / 10000; // 万円に変換
+    const dailyVariableCost = dailyRevenue * variableCostRate;
+    
+    revenueData.push(parseFloat(dailyRevenue.toFixed(1)));
+    fixedCostData.push(parseFloat(dailyFixedCosts.toFixed(1)));
+    variableCostData.push(parseFloat(dailyVariableCost.toFixed(1)));
+    breakevenLine.push(parseFloat(dailyBreakEven.toFixed(1)));
+  });
+  
+  return {
+    customerLabels,
+    revenueData,
+    fixedCostData,
+    variableCostData,
+    breakevenLine
   };
 }
 
