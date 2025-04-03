@@ -283,27 +283,59 @@ th {
 
 /* データ操作ボタン */
 .data-actions {
-  margin-top: 1rem;
-  text-align: right;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.btn {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #fff;
+  min-width: 200px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  z-index: 1000;
+  margin-top: 5px;
+}
+
+.dropdown-content a {
+  color: #333;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   transition: background-color 0.2s;
 }
 
-.btn-warning {
-  background-color: #f39c12;
-  color: white;
+.dropdown-content a:hover {
+  background-color: #f8f9fa;
 }
 
-.btn-warning:hover {
-  background-color: #e67e22;
+.dropdown-content a:first-child {
+  border-radius: 8px 8px 0 0;
+}
+
+.dropdown-content a:last-child {
+  border-radius: 0 0 8px 8px;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* アイコン */
+.icon {
+  font-size: 16px;
+  display: inline-block;
+  margin-right: 4px;
 }
 
 /* モーダル */
@@ -329,66 +361,128 @@ th {
 }
 
 .modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 15px 20px;
   background-color: #f8f9fa;
-  border-bottom: 1px solid #dee2e6;
-  border-radius: 8px 8px 0 0;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-header h3 {
+  margin: 0;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 8px;
+  font-size: 18px;
 }
 
-.modal-body {
-  padding: 20px;
-}
-
-.close {
-  color: #aaa;
-  font-size: 28px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.close:hover {
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
   color: #666;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+/* フォーム要素 */
+.form-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.form-input:focus {
+  border-color: #3498db;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(52,152,219,0.2);
+}
+
+textarea.form-input {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* モーダルアクション */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
 }
 
 /* 履歴リスト */
-.history-item {
-  padding: 15px;
-  border-bottom: 1px solid #eee;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.history-list {
+  max-height: 400px;
+  overflow-y: auto;
 }
 
-.history-item:last-child {
-  border-bottom: none;
+.history-item {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
 }
 
 .history-info {
   flex: 1;
+  min-width: 0;
 }
 
 .history-name {
-  font-weight: bold;
-  margin-bottom: 5px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #2c3e50;
 }
 
 .history-date {
-  font-size: 0.9em;
+  font-size: 12px;
   color: #666;
 }
 
 .history-memo {
-  font-size: 0.9em;
+  margin-top: 4px;
+  font-size: 13px;
   color: #666;
-  margin-top: 5px;
+  line-height: 1.4;
 }
 
 .history-actions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
+}
+
+/* ボタン改善 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.btn-secondary:hover {
+  background-color: #dee2e6;
 }
 
 /* ボタンスタイルの追加 */
@@ -428,4 +522,10 @@ textarea {
   font-size: 14px;
   min-height: 80px;
   resize: vertical;
+}
+
+/* モーダル改善 */
+.modal-content.compact {
+  max-width: 400px;
+  margin: 15% auto;
 } 

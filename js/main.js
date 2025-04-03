@@ -315,29 +315,48 @@ const historyManager = {
 function initializeModals() {
   const historyModal = document.getElementById('historyModal');
   const saveModal = document.getElementById('saveModal');
-  const showHistoryBtn = document.getElementById('showHistory');
+  const dataManageBtn = document.getElementById('dataManageBtn');
   const saveSnapshotBtn = document.getElementById('saveSnapshot');
+  const showHistoryBtn = document.getElementById('showHistory');
   const saveSnapshotConfirmBtn = document.getElementById('saveSnapshotConfirm');
-  const closeBtns = document.getElementsByClassName('close');
+  const closeBtns = document.getElementsByClassName('close-btn');
+  const modalCloseBtns = document.getElementsByClassName('modal-close');
 
-  // 履歴表示ボタン
-  showHistoryBtn.addEventListener('click', function() {
+  // ドロップダウンメニューのイベント
+  document.addEventListener('click', function(event) {
+    if (!event.target.matches('#dataManageBtn') && !event.target.closest('.dropdown-content')) {
+      const dropdowns = document.getElementsByClassName('dropdown-content');
+      Array.from(dropdowns).forEach(dropdown => {
+        if (dropdown.style.display === 'block') {
+          dropdown.style.display = 'none';
+        }
+      });
+    }
+  });
+
+  // 履歴表示
+  showHistoryBtn.addEventListener('click', function(e) {
+    e.preventDefault();
     historyModal.style.display = 'block';
     historyManager.displayHistory();
   });
 
-  // 保存ボタン
-  saveSnapshotBtn.addEventListener('click', function() {
+  // 保存モーダル表示
+  saveSnapshotBtn.addEventListener('click', function(e) {
+    e.preventDefault();
     saveModal.style.display = 'block';
+    document.getElementById('snapshotName').focus();
   });
 
-  // 保存確認ボタン
+  // 保存実行
   saveSnapshotConfirmBtn.addEventListener('click', function() {
-    const name = document.getElementById('snapshotName').value;
-    const memo = document.getElementById('snapshotMemo').value;
+    const name = document.getElementById('snapshotName').value.trim();
+    const memo = document.getElementById('snapshotMemo').value.trim();
     
     if (!name) {
-      alert('保存名を入力してください。');
+      const nameInput = document.getElementById('snapshotName');
+      nameInput.classList.add('error');
+      nameInput.focus();
       return;
     }
     
@@ -355,14 +374,31 @@ function initializeModals() {
     });
   });
 
+  Array.from(modalCloseBtns).forEach(btn => {
+    btn.addEventListener('click', function() {
+      historyModal.style.display = 'none';
+      saveModal.style.display = 'none';
+    });
+  });
+
   // モーダル外クリックで閉じる
   window.addEventListener('click', function(event) {
-    if (event.target == historyModal) {
+    if (event.target === historyModal || event.target === saveModal) {
       historyModal.style.display = 'none';
-    }
-    if (event.target == saveModal) {
       saveModal.style.display = 'none';
     }
+  });
+
+  // Enterキーでの保存
+  document.getElementById('snapshotName').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      saveSnapshotConfirmBtn.click();
+    }
+  });
+
+  // エラー表示の解除
+  document.getElementById('snapshotName').addEventListener('input', function() {
+    this.classList.remove('error');
   });
 }
 
