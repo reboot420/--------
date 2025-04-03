@@ -81,22 +81,27 @@ function updateCalculations() {
 
 // 表示値の更新
 function updateDisplayValues(data) {
+  // 数値を表示する関数
+  const formatNumber = (num) => {
+    return Number(num).toLocaleString('ja-JP', { maximumFractionDigits: 1 });
+  };
+
   // メインメトリクスの更新
   const monthlyProfitElement = document.getElementById('monthly_profit');
-  monthlyProfitElement.textContent = Math.round(data.monthlyProfit);
+  monthlyProfitElement.textContent = formatNumber(data.monthlyProfit);
   monthlyProfitElement.className = `metric-value ${data.monthlyProfit >= 0 ? 'positive' : 'negative'}`;
 
-  document.getElementById('total_investment').textContent = Math.round(data.totalInvestment);
-  document.getElementById('monthly_revenue').textContent = Math.round(data.monthlyRevenue);
-  document.getElementById('sales_per_day').textContent = `1日あたり${Math.round(data.dailySales)}万円`;
-  document.getElementById('profit_margin').textContent = `利益率${data.profitMargin.toFixed(1)}%`;
+  document.getElementById('total_investment').textContent = formatNumber(data.totalInvestment);
+  document.getElementById('monthly_revenue').textContent = formatNumber(data.monthlyRevenue);
+  document.getElementById('sales_per_day').textContent = `1日あたり${formatNumber(data.dailySales)}万円`;
+  document.getElementById('profit_margin').textContent = `利益率${formatNumber(data.profitMargin)}%`;
   
   const paybackElement = document.getElementById('payback_period');
-  paybackElement.textContent = data.paybackPeriod;
+  paybackElement.textContent = formatNumber(data.paybackPeriod);
   paybackElement.className = `metric-value ${data.monthlyProfit <= 0 ? 'negative' : (parseFloat(data.paybackPeriod) > 36 ? 'warning' : 'positive')}`;
   
-  document.getElementById('payback_years').textContent = data.paybackYears;
-  document.getElementById('roi').textContent = data.roi;
+  document.getElementById('payback_years').textContent = `約${formatNumber(data.paybackYears)}年`;
+  document.getElementById('roi').textContent = formatNumber(data.roi);
   
   // 詳細分析の更新
   document.getElementById('spend_adequacy').textContent = data.spendAdequacy.text;
@@ -108,13 +113,13 @@ function updateDisplayValues(data) {
   document.getElementById('customer_fullfillment').textContent = data.customerFulfillment.text;
   document.getElementById('customer_rating').innerHTML = data.customerFulfillment.rating;
   
-  document.getElementById('labor_cost_ratio').textContent = `${data.laborCostRatio.toFixed(1)}%`;
+  document.getElementById('labor_cost_ratio').textContent = `${formatNumber(data.laborCostRatio)}%`;
   document.getElementById('labor_rating').innerHTML = data.laborRating;
   
-  document.getElementById('rent_ratio').textContent = `${data.rentRatio.toFixed(1)}%`;
+  document.getElementById('rent_ratio').textContent = `${formatNumber(data.rentRatio)}%`;
   document.getElementById('rent_rating').innerHTML = data.rentRating;
   
-  document.getElementById('total_monthly_cost').textContent = `${Math.round(data.totalMonthlyCost)}万円`;
+  document.getElementById('total_monthly_cost').textContent = `${formatNumber(data.totalMonthlyCost)}万円`;
   document.getElementById('cost_rating').innerHTML = data.costRating;
   
   document.getElementById('analysis_result').innerHTML = data.analysisSummary;
