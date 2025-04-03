@@ -1,5 +1,5 @@
 // チャートインスタンスを格納する変数
-let expenseChart, investmentChart, paybackChart;
+let expenseChart, investmentChart, paybackChart, cumulativeProfitChart;
 
 // Chart.jsの共通設定
 Chart.register(ChartDataLabels);
@@ -106,28 +106,26 @@ function initCharts() {
   // 投資回収シミュレーションチャート
   const paybackCtx = document.getElementById('payback-chart').getContext('2d');
   paybackChart = new Chart(paybackCtx, {
-    type: 'bar',
+    type: 'line',
     data: {
-      labels: ['1年目', '2年目', '3年目', '4年目', '5年目'],
+      labels: Array.from({length: 11}, (_, i) => `${i}年目`),
       datasets: [
         {
-          label: '累積利益',
-          data: [0, 0, 0, 0, 0],
-          backgroundColor: 'rgba(76, 175, 80, 0.7)',
-          borderColor: 'rgba(76, 175, 80, 1)',
+          label: '損益',
+          data: [],
+          borderColor: '#3498db',
+          backgroundColor: 'rgba(52, 152, 219, 0.1)',
           borderWidth: 2,
-          borderRadius: 5,
-          barPercentage: 0.6,
-          categoryPercentage: 0.7
+          fill: true,
+          tension: 0.4
         },
         {
-          label: '初期投資',
-          data: [0, 0, 0, 0, 0],
-          backgroundColor: 'rgba(244, 67, 54, 0.1)',
-          borderColor: 'rgba(244, 67, 54, 1)',
-          borderWidth: 3,
+          label: '初期投資額',
+          data: [],
+          borderColor: '#e74c3c',
+          borderWidth: 2,
           borderDash: [5, 5],
-          type: 'line',
+          fill: false,
           pointRadius: 0
         }
       ]
@@ -136,39 +134,81 @@ function initCharts() {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: {
-          position: 'top',
-          labels: {
-            boxWidth: 12,
-            padding: 10,
-            font: { size: 11 }
+        tooltip: {
+          mode: 'index',
+          intersect: false,
+          callbacks: {
+            label: function(context) {
+              return `${context.dataset.label}: ${Math.round(context.parsed.y)}万円`;
+            }
           }
         },
+        legend: {
+          position: 'top'
+        },
         datalabels: {
-          formatter: (value, ctx) => {
-            if (ctx.dataset.type === 'line') return null;
-            return value > 0 ? `${Math.round(value)}万円` : '';
-          },
-          color: 'rgba(0, 0, 0, 0.7)',
-          font: {
-            weight: 'bold',
-            size: 10
-          },
-          anchor: 'end',
-          align: 'top',
-          offset: 0
+          display: false
         }
       },
       scales: {
         y: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: '金額（万円）'
-          },
           ticks: {
             callback: function(value) {
-              return Math.round(value) + '万円';
+              return value + '万円';
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // 累積利益チャート
+  const cumulativeProfitCtx = document.getElementById('cumulative-profit-chart').getContext('2d');
+  cumulativeProfitChart = new Chart(cumulativeProfitCtx, {
+    type: 'bar',
+    data: {
+      labels: Array.from({length: 11}, (_, i) => `${i}年目`),
+      datasets: [{
+        label: '累積利益',
+        data: [],
+        backgroundColor: 'rgba(46, 204, 113, 0.8)',
+        borderColor: 'rgba(46, 204, 113, 1)',
+        borderWidth: 1,
+        barThickness: 20
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return `累積利益: ${Math.round(context.parsed.x)}万円`;
+            }
+          }
+        },
+        legend: {
+          display: false
+        },
+        datalabels: {
+          anchor: 'end',
+          align: 'right',
+          formatter: function(value) {
+            return Math.round(value) + '万円';
+          },
+          color: 'black',
+          font: {
+            weight: 'bold'
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            callback: function(value) {
+              return value + '万円';
             }
           }
         }
@@ -202,100 +242,29 @@ function updateCharts(data) {
 
   // 投資回収シミュレーションチャートの更新
   updatePaybackChart(data);
+  
+  // 累積利益チャートの更新
+  updateCumulativeProfitChart(data);
 }
 
 // 投資回収シミュレーションチャートの更新
 function updatePaybackChart(data) {
   if (!paybackChart) return;
   
-  // 10年分のラベルを生成
-  const labels = Array.from({length: 11}, (_, i) => `${i}年目`);
-  
-  // 累積利益の計算
-  const cumulativeProfits = data.cumulativeProfits;
   const initialInvestment = data.investmentLine[0];
+  const profitLoss = data.cumulativeProfits.map(profit => profit - initialInvestment);
   
-  // 損益の計算（累積利益 - 初期投資）
-  const profitLoss = cumulativeProfits.map(profit => profit - initialInvestment);
-  
-  paybackChart.data.labels = labels;
-  paybackChart.data.datasets = [
-    {
-      label: '累積利益',
-      data: cumulativeProfits,
-      borderColor: '#2ecc71',
-      backgroundColor: 'rgba(46, 204, 113, 0.1)',
-      borderWidth: 2,
-      fill: true,
-      tension: 0.4
-    },
-    {
-      label: '初期投資額',
-      data: data.investmentLine,
-      borderColor: '#e74c3c',
-      borderWidth: 2,
-      borderDash: [5, 5],
-      fill: false,
-      pointRadius: 0
-    },
-    {
-      label: '損益',
-      data: profitLoss,
-      borderColor: '#3498db',
-      backgroundColor: 'rgba(52, 152, 219, 0.1)',
-      borderWidth: 2,
-      fill: true,
-      tension: 0.4
-    }
-  ];
-  
-  paybackChart.options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      tooltip: {
-        mode: 'index',
-        intersect: false,
-        callbacks: {
-          label: function(context) {
-            let label = context.dataset.label || '';
-            if (label) {
-              label += ': ';
-            }
-            if (context.parsed.y !== null) {
-              label += Math.round(context.parsed.y) + '万円';
-            }
-            return label;
-          }
-        }
-      },
-      legend: {
-        position: 'top',
-        labels: {
-          font: {
-            size: 12
-          }
-        }
-      },
-      datalabels: {
-        display: false
-      }
-    },
-    scales: {
-      x: {
-        grid: {
-          display: false
-        }
-      },
-      y: {
-        ticks: {
-          callback: function(value) {
-            return value + '万円';
-          }
-        }
-      }
-    }
-  };
+  paybackChart.data.datasets[0].data = profitLoss;
+  paybackChart.data.datasets[1].data = data.investmentLine;
   
   paybackChart.update();
+}
+
+// 累積利益チャートの更新
+function updateCumulativeProfitChart(data) {
+  if (!cumulativeProfitChart) return;
+  
+  cumulativeProfitChart.data.datasets[0].data = data.cumulativeProfits;
+  
+  cumulativeProfitChart.update();
 } 
