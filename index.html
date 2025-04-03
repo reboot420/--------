@@ -13,7 +13,19 @@
   <h1>飲食店事業計画分析ツール</h1>
   
   <div class="card">
-    <h2>初期投資（万円）</h2>
+    <div class="card-header">
+      <h2>初期投資（万円）</h2>
+      <div class="card-actions">
+        <button id="showHistory" class="btn btn-outline" title="保存した計画を表示">
+          <span class="icon">📋</span>
+          保存済みの計画
+        </button>
+        <button id="saveSnapshot" class="btn btn-primary" title="現在の計画を保存">
+          <span class="icon">💾</span>
+          この計画を保存
+        </button>
+      </div>
+    </div>
     <div class="form-group">
       <label for="renovation">内装工事</label>
       <div class="input-with-unit">
@@ -120,29 +132,6 @@
   <div class="result-section">
     <div class="section-header">
       <h2>事業計画分析結果</h2>
-      <div class="data-actions">
-        <div class="dropdown">
-          <button id="dataManageBtn" class="btn btn-primary">
-            <span class="icon">⚙️</span>
-            データ管理
-            <span class="icon">▼</span>
-          </button>
-          <div class="dropdown-content">
-            <a href="#" id="saveSnapshot">
-              <span class="icon">💾</span>
-              現在の入力を保存
-            </a>
-            <a href="#" id="showHistory">
-              <span class="icon">📋</span>
-              履歴を表示
-            </a>
-            <a href="#" id="resetData">
-              <span class="icon">🔄</span>
-              データをリセット
-            </a>
-          </div>
-        </div>
-      </div>
     </div>
     
     <!-- 履歴モーダル -->
@@ -151,11 +140,18 @@
         <div class="modal-header">
           <h3>
             <span class="icon">📋</span>
-            保存された履歴
+            保存済みの事業計画
           </h3>
           <button class="close-btn">&times;</button>
         </div>
         <div class="modal-body">
+          <div class="empty-history-message" id="emptyHistoryMessage" style="display: none;">
+            <div class="message-content">
+              <span class="icon large">📝</span>
+              <p>保存された事業計画はありません</p>
+              <p class="sub-text">「この計画を保存」ボタンから計画を保存できます</p>
+            </div>
+          </div>
           <div id="historyList" class="history-list"></div>
         </div>
       </div>
@@ -167,16 +163,32 @@
         <div class="modal-header">
           <h3>
             <span class="icon">💾</span>
-            データを保存
+            事業計画を保存
           </h3>
           <button class="close-btn">&times;</button>
         </div>
         <div class="modal-body">
-          <div class="form-group">
-            <input type="text" id="snapshotName" class="form-input" placeholder="保存名を入力（例：開業時の計画）">
+          <div class="save-summary">
+            <div class="summary-item">
+              <span class="summary-label">初期投資合計</span>
+              <span class="summary-value" id="save_total_investment">-</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">月間売上</span>
+              <span class="summary-value" id="save_monthly_revenue">-</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">月間利益</span>
+              <span class="summary-value" id="save_monthly_profit">-</span>
+            </div>
           </div>
           <div class="form-group">
-            <textarea id="snapshotMemo" class="form-input" placeholder="メモを入力（任意）"></textarea>
+            <label for="snapshotName">計画の名前</label>
+            <input type="text" id="snapshotName" class="form-input" placeholder="例：開業時の計画">
+          </div>
+          <div class="form-group">
+            <label for="snapshotMemo">メモ（任意）</label>
+            <textarea id="snapshotMemo" class="form-input" placeholder="計画の詳細や特記事項があれば入力してください"></textarea>
           </div>
           <div class="modal-actions">
             <button id="saveSnapshotConfirm" class="btn btn-primary">
@@ -306,7 +318,7 @@
   </div>
 
   <div class="footer">
-    1oz
+    1oz専用ツール
   </div>
 
   <script src="js/calculations.js"></script>
