@@ -169,8 +169,9 @@ function calculatePaybackChartData(annualProfit, years) {
 
 // 初期化処理
 document.addEventListener('DOMContentLoaded', function() {
+  // 初期化時に一度計算を実行
   initCharts();
-  updateCalculations();
+  setTimeout(updateCalculations, 100); // 少し遅延を入れて確実にDOM要素が準備できてから実行
   
   // 入力フィールドの変更イベントリスナーを設定
   const inputFields = document.querySelectorAll('input[type="number"]');

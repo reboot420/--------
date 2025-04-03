@@ -104,9 +104,15 @@ function calculateROI(annualProfit, initialInvestment) {
 
 // 損益分岐点の計算
 function calculateBreakEven(fixedCosts, variableCosts, revenue) {
+  if (revenue.monthly <= 0) return { revenue: 0, customers: 0 };
+  
   const variableCostRatio = variableCosts.total / revenue.monthly;
   const breakEvenRevenue = fixedCosts.total / (1 - variableCostRatio);
-  const breakEvenCustomers = Math.ceil((breakEvenRevenue * 10000) / (inputs.spend * inputs.days));
+  
+  // revenueオブジェクトから1日あたりの顧客単価を計算
+  const dailyRevenue = revenue.daily;
+  const dailyCustomers = dailyRevenue > 0 ? revenue.daily / (revenue.monthly / (dailyRevenue * 26)) : 0;
+  const breakEvenCustomers = Math.ceil(breakEvenRevenue / (dailyRevenue / dailyCustomers));
   
   return {
     revenue: breakEvenRevenue,
